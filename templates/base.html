@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Racha{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <script src="/static/js/htmx.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900">
+    {% block nav %}
+    <nav class="bg-white border-b border-gray-200 px-4 py-3">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <a href="/" class="text-xl font-bold text-orange-600">Racha</a>
+            {% block nav_right %}{% endblock %}
+        </div>
+    </nav>
+    {% endblock %}
+    <main class="max-w-4xl mx-auto px-4 py-6">
+        {% block flash %}
+        {% if let Some(msg) = flash_message %}
+        <div class="mb-4 p-3 rounded-lg {% if flash_is_error %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+            {{ msg }}
+        </div>
+        {% endif %}
+        {% endblock %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

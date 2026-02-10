@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }} — Racha{% endblock %}
+
+{% block nav_right %}
+<div class="flex items-center gap-4">
+    <a href="/" class="text-sm text-gray-600 hover:text-gray-900">&larr; Dashboard</a>
+    <form method="post" action="/logout">
+        <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">Log out</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold">{{ group.name }}</h1>
+    <div class="mt-1 flex items-center gap-4 text-sm text-gray-500">
+        <span>Invite code: <code class="bg-gray-100 px-2 py-0.5 rounded font-mono">{{ group.invite_code }}</code></span>
+    </div>
+</div>
+
+<div class="space-y-6">
+    {% for (username, member_tasks) in members_grouped %}
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <h3 class="font-semibold text-gray-800 mb-3">{{ username }}</h3>
+        <div class="space-y-2">
+            {% for mt in member_tasks %}
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    {% if mt.completed_today %}
+                    <span class="text-green-600">&#10003;</span>
+                    {% else %}
+                    <span class="text-gray-300">&#9675;</span>
+                    {% endif %}
+                    <span>{{ mt.task_name }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold {% if mt.current_streak >= 100 %}text-purple-600{% elif mt.current_streak >= 30 %}text-orange-600{% elif mt.current_streak >= 7 %}text-yellow-600{% else %}text-gray-700{% endif %}">
+                        {{ mt.current_streak }}
+                    </span>
+                    <span class="text-xs text-gray-500">day{{ mt.current_streak|pluralize }}</span>
+                    {% if mt.current_streak == 7 || mt.current_streak == 30 || mt.current_streak == 100 %}
+                    <span class="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-full font-medium">
+                        &#127942; Milestone!
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    {% if members_grouped.is_empty() %}
+    <p class="text-gray-500 text-center py-8">No members with active tasks yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

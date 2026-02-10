@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Log In — Racha{% endblock %}
+{% block nav %}{% endblock %}
+
+{% block content %}
+<div class="max-w-sm mx-auto mt-16">
+    <h1 class="text-2xl font-bold text-center mb-6">Log in to <span class="text-orange-600">Racha</span></h1>
+    {% if let Some(err) = error %}
+    <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700">{{ err }}</div>
+    {% endif %}
+    <form method="post" action="/login" class="space-y-4">
+        <div>
+            <label for="username" class="block text-sm font-medium mb-1">Username</label>
+            <input type="text" id="username" name="username" required
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+        </div>
+        <div>
+            <label for="password" class="block text-sm font-medium mb-1">Password</label>
+            <input type="password" id="password" name="password" required
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+        </div>
+        <button type="submit"
+                class="w-full bg-orange-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-orange-700 transition">
+            Log In
+        </button>
+    </form>
+    <p class="mt-4 text-center text-sm text-gray-600">
+        Don't have an account? <a href="/register" class="text-orange-600 hover:underline">Sign up</a>
+    </p>
+</div>
+{% endblock %}

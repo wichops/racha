@@ -1,0 +1,6 @@
+/target
+racha.db
+racha.db-shm
+racha.db-wal
+.env
+static/css/output.css
