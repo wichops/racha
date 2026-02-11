@@ -41,37 +41,19 @@ async fn login_submit(
 ) -> Result<Redirect, LoginTemplate> {
     let user = User::find_by_username(&state.db, &form.username)
         .await
-        .map_err(|_| LoginTemplate {
-            error: Some("Internal error".to_string()),
-            flash_message: None,
-            flash_is_error: false,
-        })?
-        .ok_or_else(|| LoginTemplate {
-            error: Some("Invalid username or password".to_string()),
-            flash_message: None,
-            flash_is_error: false,
-        })?;
+        .map_err(|_| LoginTemplate::with_error("Internal error"))?
+        .ok_or_else(|| LoginTemplate::with_error("Invalid username or password"))?;
 
     let valid = verify_password(&form.password, &user.password_hash)
-        .map_err(|_| LoginTemplate {
-            error: Some("Internal error".to_string()),
-            flash_message: None,
-            flash_is_error: false,
-        })?;
+        .map_err(|_| LoginTemplate::with_error("Internal error"))?;
 
     if !valid {
-        return Err(LoginTemplate {
-            error: Some("Invalid username or password".to_string()),
-            flash_message: None,
-            flash_is_error: false,
-        });
+        return Err(LoginTemplate::with_error("Invalid username or password"));
     }
 
-    login_session(&session, user.id).await.map_err(|_| LoginTemplate {
-        error: Some("Session error".to_string()),
-        flash_message: None,
-        flash_is_error: false,
-    })?;
+    login_session(&session, user.id)
+        .await
+        .map_err(|_| LoginTemplate::with_error("Session error"))?;
 
     Ok(Redirect::to("/"))
 }
@@ -97,39 +79,22 @@ async fn register_submit(
     Form(form): Form<RegisterForm>,
 ) -> Result<Redirect, RegisterTemplate> {
     if form.username.len() < 3 {
-        return Err(RegisterTemplate {
-            error: Some("Username must be at least 3 characters".to_string()),
-            flash_message: None,
-            flash_is_error: false,
-        });
+        return Err(RegisterTemplate::with_error("Username must be at least 3 characters"));
     }
     if form.password.len() < 8 {
-        return Err(RegisterTemplate {
-            error: Some("Password must be at least 8 characters".to_string()),
-            flash_message: None,
-            flash_is_error: false,
-        });
+        return Err(RegisterTemplate::with_error("Password must be at least 8 characters"));
     }
 
-    let password_hash = hash_password(&form.password).map_err(|_| RegisterTemplate {
-        error: Some("Internal error".to_string()),
-        flash_message: None,
-        flash_is_error: false,
-    })?;
+    let password_hash = hash_password(&form.password)
+        .map_err(|_| RegisterTemplate::with_error("Internal error"))?;
 
     let user_id = User::create(&state.db, &form.username, &form.email, &password_hash)
         .await
-        .map_err(|_| RegisterTemplate {
-            error: Some("Username or email already taken".to_string()),
-            flash_message: None,
-            flash_is_error: false,
-        })?;
+        .map_err(|_| RegisterTemplate::with_error("Username or email already taken"))?;
 
-    login_session(&session, user_id).await.map_err(|_| RegisterTemplate {
-        error: Some("Session error".to_string()),
-        flash_message: None,
-        flash_is_error: false,
-    })?;
+    login_session(&session, user_id)
+        .await
+        .map_err(|_| RegisterTemplate::with_error("Session error"))?;
 
     Ok(Redirect::to("/"))
 }

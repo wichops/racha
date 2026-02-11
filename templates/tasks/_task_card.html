@@ -1,33 +1,35 @@
-<div id="task-{{ task.id }}" class="p-4 bg-white rounded-lg border border-gray-200">
+<div id="task-{{ task.id }}" class="neu-raised p-4 animate-slide-in">
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
             {% if task.completed_today %}
             <button hx-post="/tasks/{{ task.id }}/toggle" hx-target="#task-{{ task.id }}" hx-swap="outerHTML"
-                    class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-red-100 hover:text-red-400 flex items-center justify-center text-lg transition">
-                &#10003;
+                    class="neu-checkbox-checked shrink-0">
+                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </button>
             {% else %}
             <button hx-post="/tasks/{{ task.id }}/toggle" hx-target="#task-{{ task.id }}" hx-swap="outerHTML"
-                    class="w-8 h-8 rounded-full border-2 border-gray-300 hover:border-orange-500 transition flex items-center justify-center">
+                    class="neu-checkbox shrink-0">
             </button>
             {% endif %}
             <div>
-                <div class="font-medium">{{ task.name }}</div>
+                <div class="font-medium {% if task.completed_today %}task-completed-text{% endif %}">{{ task.name }}</div>
                 {% if let Some(desc) = task.description %}
-                <div class="text-sm text-gray-500">{{ desc }}</div>
+                <div class="text-sm" style="color: var(--text-secondary);">{{ desc }}</div>
                 {% endif %}
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <div class="text-right">
-                <div class="text-2xl font-bold {% if task.current_streak >= 30 %}text-orange-600{% elif task.current_streak >= 7 %}text-yellow-600{% else %}text-gray-700{% endif %}">
-                    {{ task.current_streak }}
-                </div>
-                <div class="text-xs text-gray-500">day{{ task.current_streak|pluralize }}</div>
+            {% if task.current_streak > 0 %}
+            <div class="streak-badge {% if task.current_streak > 60 %}streak-level-4{% elif task.current_streak > 30 %}streak-level-3{% elif task.current_streak > 10 %}streak-level-2{% else %}streak-level-1{% endif %}">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3 2-5 3-7 .5 2 2 3 2 3 0-4 3-8 6-10-.5 2 0 4 1 5.5S19 10 19 13c0 1-.5 2.5-1.5 4-.5-1.5-1.5-2-1.5-2 0 2-1 4-2.5 5.5-.5.5-1 1-1.5 2.5z"/></svg>
+                {{ task.current_streak }}
             </div>
+            {% else %}
+            <div class="text-sm" style="color: var(--text-secondary);">0 days</div>
+            {% endif %}
             <button hx-get="/tasks/{{ task.id }}/edit" hx-target="#task-{{ task.id }}" hx-swap="outerHTML"
-                    class="text-gray-400 hover:text-gray-600 text-sm">
-                &#9998;
+                    class="neu-flat w-8 h-8 flex items-center justify-center shrink-0" style="border-radius: 50%;">
+                <svg class="w-3.5 h-3.5" style="color: var(--text-secondary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
             </button>
         </div>
     </div>

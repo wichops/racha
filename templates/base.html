@@ -4,22 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Racha{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/output.css">
     <script src="/static/js/htmx.min.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-900">
+<body class="min-h-screen">
     {% block nav %}
-    <nav class="bg-white border-b border-gray-200 px-4 py-3">
+    <nav class="neu-raised mx-4 mt-4 mb-6 px-6 py-3">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <a href="/" class="text-xl font-bold text-orange-600">Racha</a>
+            <a href="/" class="text-xl font-bold gradient-text">Racha</a>
             {% block nav_right %}{% endblock %}
         </div>
     </nav>
     {% endblock %}
-    <main class="max-w-4xl mx-auto px-4 py-6">
+    <main class="max-w-4xl mx-auto px-4 py-2">
         {% block flash %}
         {% if let Some(msg) = flash_message %}
-        <div class="mb-4 p-3 rounded-lg {% if flash_is_error %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+        <div class="mb-4 {% if flash_is_error %}flash-error{% else %}flash-success{% endif %}">
             {{ msg }}
         </div>
         {% endif %}

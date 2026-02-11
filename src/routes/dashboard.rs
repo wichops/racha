@@ -24,11 +24,20 @@ async fn dashboard(
     let tasks = TaskWithStreak::for_user(&state.db, user.id).await.unwrap_or_default();
     let groups = Group::user_groups(&state.db, user.id).await.unwrap_or_default();
 
+    let total_count = tasks.len() as i64;
+    let completed_count = tasks.iter().filter(|t| t.completed_today).count() as i64;
+    let active_streak_count = tasks.iter().filter(|t| t.current_streak > 0).count() as i64;
+    let longest_streak = tasks.iter().map(|t| t.current_streak).max().unwrap_or(0);
+
     DashboardTemplate {
         username,
         tasks,
         groups,
         flash_message: None,
         flash_is_error: false,
+        completed_count,
+        total_count,
+        active_streak_count,
+        longest_streak,
     }
 }

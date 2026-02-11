@@ -4,44 +4,56 @@
 
 {% block nav_right %}
 <div class="flex items-center gap-4">
-    <a href="/" class="text-sm text-gray-600 hover:text-gray-900">&larr; Dashboard</a>
+    <a href="/" class="text-sm neu-link flex items-center gap-1">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Dashboard
+    </a>
     <form method="post" action="/logout">
-        <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">Log out</button>
+        <button type="submit" class="text-sm neu-link">Log out</button>
     </form>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="mb-6">
-    <h1 class="text-2xl font-bold">{{ group.name }}</h1>
-    <div class="mt-1 flex items-center gap-4 text-sm text-gray-500">
-        <span>Invite code: <code class="bg-gray-100 px-2 py-0.5 rounded font-mono">{{ group.invite_code }}</code></span>
+    <h1 class="text-2xl font-bold gradient-text">{{ group.name }}</h1>
+    <div class="mt-2 flex items-center gap-3">
+        <span class="text-sm" style="color: var(--text-secondary);">Invite code:</span>
+        <code class="neu-inset px-3 py-1 font-mono text-sm" style="color: var(--gradient-purple);">{{ group.invite_code }}</code>
     </div>
 </div>
 
-<div class="space-y-6">
+<div class="space-y-5">
     {% for (username, member_tasks) in members_grouped %}
-    <div class="bg-white rounded-lg border border-gray-200 p-4">
-        <h3 class="font-semibold text-gray-800 mb-3">{{ username }}</h3>
+    <div class="neu-raised p-5">
+        <h3 class="font-semibold mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5" style="color: var(--gradient-purple);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span style="color: var(--text-primary);">{{ username }}</span>
+        </h3>
         <div class="space-y-2">
             {% for mt in member_tasks %}
-            <div class="flex items-center justify-between">
+            <div class="neu-flat p-3 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     {% if mt.completed_today %}
-                    <span class="text-green-600">&#10003;</span>
+                    <svg class="w-5 h-5" style="color: var(--gradient-green);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     {% else %}
-                    <span class="text-gray-300">&#9675;</span>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" style="color: var(--text-secondary); opacity: 0.4;"/></svg>
                     {% endif %}
-                    <span>{{ mt.task_name }}</span>
+                    <span class="{% if mt.completed_today %}task-completed-text{% endif %}">{{ mt.task_name }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="font-bold {% if mt.current_streak >= 100 %}text-purple-600{% elif mt.current_streak >= 30 %}text-orange-600{% elif mt.current_streak >= 7 %}text-yellow-600{% else %}text-gray-700{% endif %}">
+                    {% if mt.current_streak > 0 %}
+                    <div class="streak-badge {% if mt.current_streak > 60 %}streak-level-4{% elif mt.current_streak > 30 %}streak-level-3{% elif mt.current_streak > 10 %}streak-level-2{% else %}streak-level-1{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3 2-5 3-7 .5 2 2 3 2 3 0-4 3-8 6-10-.5 2 0 4 1 5.5S19 10 19 13c0 1-.5 2.5-1.5 4-.5-1.5-1.5-2-1.5-2 0 2-1 4-2.5 5.5-.5.5-1 1-1.5 2.5z"/></svg>
                         {{ mt.current_streak }}
-                    </span>
-                    <span class="text-xs text-gray-500">day{{ mt.current_streak|pluralize }}</span>
+                    </div>
+                    {% else %}
+                    <span class="text-xs" style="color: var(--text-secondary);">0 days</span>
+                    {% endif %}
                     {% if mt.current_streak == 7 || mt.current_streak == 30 || mt.current_streak == 100 %}
-                    <span class="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-full font-medium">
-                        &#127942; Milestone!
+                    <span class="milestone-badge">
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        Milestone!
                     </span>
                     {% endif %}
                 </div>
@@ -51,7 +63,9 @@
     </div>
     {% endfor %}
     {% if members_grouped.is_empty() %}
-    <p class="text-gray-500 text-center py-8">No members with active tasks yet.</p>
+    <div class="neu-raised p-8 text-center">
+        <p style="color: var(--text-secondary);">No members with active tasks yet.</p>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

@@ -11,4 +11,8 @@ pub struct DashboardTemplate {
     pub groups: Vec<GroupWithMembership>,
     pub flash_message: Option<String>,
     pub flash_is_error: bool,
+    pub completed_count: i64,
+    pub total_count: i64,
+    pub active_streak_count: i64,
+    pub longest_streak: i64,
 }
