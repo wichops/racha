@@ -108,18 +108,18 @@ impl Group {
                 FROM completions c
                 JOIN tasks t ON t.id = c.task_id
                 JOIN group_members gm ON gm.user_id = t.user_id AND gm.group_id = $1
-                WHERE c.completed_date = CURRENT_DATE
+                WHERE c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                 UNION ALL
                 -- Base case: completed yesterday but not today
                 SELECT c.task_id, c.completed_date, 1
                 FROM completions c
                 JOIN tasks t ON t.id = c.task_id
                 JOIN group_members gm ON gm.user_id = t.user_id AND gm.group_id = $1
-                WHERE c.completed_date = CURRENT_DATE - INTERVAL '1 day'
+                WHERE c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE - INTERVAL '1 day'
                   AND NOT EXISTS (
                       SELECT 1 FROM completions c2
                       WHERE c2.task_id = c.task_id
-                        AND c2.completed_date = CURRENT_DATE
+                        AND c2.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                   )
                 UNION ALL
                 -- Recursive: walk backwards day by day
@@ -136,7 +136,7 @@ impl Group {
                 COALESCE(MAX(s.streak_count), 0)::BIGINT AS current_streak,
                 EXISTS (
                     SELECT 1 FROM completions c
-                    WHERE c.task_id = t.id AND c.completed_date = CURRENT_DATE
+                    WHERE c.task_id = t.id AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                 ) AS completed_today
             FROM group_members gm
             JOIN users u ON u.id = gm.user_id

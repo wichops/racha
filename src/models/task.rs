@@ -80,18 +80,18 @@ impl TaskWithStreak {
                 FROM completions c
                 JOIN tasks t ON t.id = c.task_id
                 WHERE t.user_id = $1
-                  AND c.completed_date = CURRENT_DATE
+                  AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                 UNION ALL
                 -- If not completed today, check yesterday as base
                 SELECT c.task_id, c.completed_date, 1
                 FROM completions c
                 JOIN tasks t ON t.id = c.task_id
                 WHERE t.user_id = $1
-                  AND c.completed_date = CURRENT_DATE - INTERVAL '1 day'
+                  AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE - INTERVAL '1 day'
                   AND NOT EXISTS (
                       SELECT 1 FROM completions c2
                       WHERE c2.task_id = c.task_id
-                        AND c2.completed_date = CURRENT_DATE
+                        AND c2.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                   )
                 UNION ALL
                 -- Recursive: walk backwards day by day
@@ -110,7 +110,7 @@ impl TaskWithStreak {
                 COALESCE(MAX(s.streak_count), 0)::BIGINT AS current_streak,
                 EXISTS (
                     SELECT 1 FROM completions c
-                    WHERE c.task_id = t.id AND c.completed_date = CURRENT_DATE
+                    WHERE c.task_id = t.id AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                 ) AS completed_today
             FROM tasks t
             LEFT JOIN streak_cte s ON s.task_id = t.id
@@ -131,16 +131,16 @@ impl TaskWithStreak {
                 SELECT c.task_id, c.completed_date, 1
                 FROM completions c
                 WHERE c.task_id = $1
-                  AND c.completed_date = CURRENT_DATE
+                  AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                 UNION ALL
                 SELECT c.task_id, c.completed_date, 1
                 FROM completions c
                 WHERE c.task_id = $1
-                  AND c.completed_date = CURRENT_DATE - INTERVAL '1 day'
+                  AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE - INTERVAL '1 day'
                   AND NOT EXISTS (
                       SELECT 1 FROM completions c2
                       WHERE c2.task_id = c.task_id
-                        AND c2.completed_date = CURRENT_DATE
+                        AND c2.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                   )
                 UNION ALL
                 SELECT s.task_id, c.completed_date, s.streak_count + 1
@@ -158,7 +158,7 @@ impl TaskWithStreak {
                 COALESCE(MAX(s.streak_count), 0)::BIGINT AS current_streak,
                 EXISTS (
                     SELECT 1 FROM completions c
-                    WHERE c.task_id = t.id AND c.completed_date = CURRENT_DATE
+                    WHERE c.task_id = t.id AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
                 ) AS completed_today
             FROM tasks t
             LEFT JOIN streak_cte s ON s.task_id = t.id
