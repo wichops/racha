@@ -1,0 +1,30 @@
+<!-- Progress bar -->
+<div class="neu-raised p-4">
+    <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium" style="color: var(--text-secondary);">Today's Progress</span>
+        <span class="text-sm font-bold gradient-text">{{ completed_count }}/{{ total_count }}</span>
+    </div>
+    <div class="progress-track">
+        <div class="progress-fill" style="width: {% if total_count > 0 %}{{ completed_count * 100 / total_count }}{% else %}0{% endif %}%"></div>
+    </div>
+</div>
+
+<!-- Streak summary -->
+{% if active_streak_count > 0 %}
+<div class="flex gap-4">
+    <div class="neu-flat p-3 flex-1 flex items-center gap-3">
+        <svg class="w-5 h-5" style="color: var(--gradient-pink);" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3 2-5 3-7 .5 2 2 3 2 3 0-4 3-8 6-10-.5 2 0 4 1 5.5S19 10 19 13c0 1-.5 2.5-1.5 4-.5-1.5-1.5-2-1.5-2 0 2-1 4-2.5 5.5-.5.5-1 1-1.5 2.5z"/></svg>
+        <div>
+            <div class="text-lg font-bold" style="color: var(--text-primary);">{{ active_streak_count }}</div>
+            <div class="text-xs" style="color: var(--text-secondary);">Active Streak{{ active_streak_count|pluralize }}</div>
+        </div>
+    </div>
+    <div class="neu-flat p-3 flex-1 flex items-center gap-3">
+        <svg class="w-5 h-5" style="color: #fbbf24;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3 2-5 3-7 .5 2 2 3 2 3 0-4 3-8 6-10-.5 2 0 4 1 5.5S19 10 19 13c0 1-.5 2.5-1.5 4-.5-1.5-1.5-2-1.5-2 0 2-1 4-2.5 5.5-.5.5-1 1-1.5 2.5z"/></svg>
+        <div>
+            <div class="text-lg font-bold" style="color: var(--text-primary);">{{ longest_streak }}</div>
+            <div class="text-xs" style="color: var(--text-secondary);">Longest Streak</div>
+        </div>
+    </div>
+</div>
+{% endif %}

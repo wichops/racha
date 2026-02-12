@@ -16,3 +16,12 @@ pub struct DashboardTemplate {
     pub active_streak_count: i64,
     pub longest_streak: i64,
 }
+
+#[derive(Template)]
+#[template(path = "dashboard/_progress_oob.html")]
+pub struct ProgressOobPartial {
+    pub completed_count: i64,
+    pub total_count: i64,
+    pub active_streak_count: i64,
+    pub longest_streak: i64,
+}
