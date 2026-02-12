@@ -74,18 +74,31 @@ impl TaskWithStreak {
     pub async fn for_user(pool: &PgPool, user_id: i64) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as(
             r#"
-            WITH RECURSIVE streak_cte AS (
-                SELECT DISTINCT ON (c.task_id) c.task_id, c.completed_date AS streak_date, 1 AS streak_count
+            WITH RECURSIVE streak_cte(task_id, streak_date, streak_count) AS (
+                -- Base case: check if completed today
+                SELECT c.task_id, c.completed_date, 1
                 FROM completions c
                 JOIN tasks t ON t.id = c.task_id
-                WHERE t.user_id = $1 AND t.archived = FALSE
-                  AND c.completed_date IN (CURRENT_DATE, CURRENT_DATE - 1)
-                ORDER BY c.task_id, c.completed_date DESC
+                WHERE t.user_id = $1
+                  AND c.completed_date = CURRENT_DATE
                 UNION ALL
+                -- If not completed today, check yesterday as base
+                SELECT c.task_id, c.completed_date, 1
+                FROM completions c
+                JOIN tasks t ON t.id = c.task_id
+                WHERE t.user_id = $1
+                  AND c.completed_date = CURRENT_DATE - INTERVAL '1 day'
+                  AND NOT EXISTS (
+                      SELECT 1 FROM completions c2
+                      WHERE c2.task_id = c.task_id
+                        AND c2.completed_date = CURRENT_DATE
+                  )
+                UNION ALL
+                -- Recursive: walk backwards day by day
                 SELECT s.task_id, c.completed_date, s.streak_count + 1
                 FROM streak_cte s
                 JOIN completions c ON c.task_id = s.task_id
-                  AND c.completed_date = s.streak_date - 1
+                  AND c.completed_date = s.streak_date - INTERVAL '1 day'
             )
             SELECT
                 t.id,
@@ -114,17 +127,26 @@ impl TaskWithStreak {
     pub async fn find_by_id(pool: &PgPool, task_id: i64) -> sqlx::Result<Option<Self>> {
         sqlx::query_as(
             r#"
-            WITH RECURSIVE streak_cte AS (
-                SELECT DISTINCT ON (c.task_id) c.task_id, c.completed_date AS streak_date, 1 AS streak_count
+            WITH RECURSIVE streak_cte(task_id, streak_date, streak_count) AS (
+                SELECT c.task_id, c.completed_date, 1
                 FROM completions c
                 WHERE c.task_id = $1
-                  AND c.completed_date IN (CURRENT_DATE, CURRENT_DATE - 1)
-                ORDER BY c.task_id, c.completed_date DESC
+                  AND c.completed_date = CURRENT_DATE
+                UNION ALL
+                SELECT c.task_id, c.completed_date, 1
+                FROM completions c
+                WHERE c.task_id = $1
+                  AND c.completed_date = CURRENT_DATE - INTERVAL '1 day'
+                  AND NOT EXISTS (
+                      SELECT 1 FROM completions c2
+                      WHERE c2.task_id = c.task_id
+                        AND c2.completed_date = CURRENT_DATE
+                  )
                 UNION ALL
                 SELECT s.task_id, c.completed_date, s.streak_count + 1
                 FROM streak_cte s
                 JOIN completions c ON c.task_id = s.task_id
-                  AND c.completed_date = s.streak_date - 1
+                  AND c.completed_date = s.streak_date - INTERVAL '1 day'
             )
             SELECT
                 t.id,
