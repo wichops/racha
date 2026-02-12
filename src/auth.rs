@@ -7,6 +7,7 @@ use axum::{
     http::request::Parts,
     response::Redirect,
 };
+use chrono::NaiveDate;
 use tower_sessions::Session;
 
 const USER_ID_KEY: &str = "user_id";
@@ -56,4 +57,45 @@ where
             None => Err(Redirect::to("/login")),
         }
     }
+}
+
+pub struct LocalDate(pub NaiveDate);
+
+impl<S> FromRequestParts<S> for LocalDate
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        let date = parse_from_header(parts)
+            .or_else(|| parse_from_cookie(parts))
+            .unwrap_or_else(server_today);
+        Ok(LocalDate(date))
+    }
+}
+
+fn parse_date(val: &str) -> Option<NaiveDate> {
+    NaiveDate::parse_from_str(val.trim(), "%Y-%m-%d").ok()
+}
+
+fn parse_from_header(parts: &Parts) -> Option<NaiveDate> {
+    parts.headers.get("X-Local-Date")?.to_str().ok().and_then(parse_date)
+}
+
+fn parse_from_cookie(parts: &Parts) -> Option<NaiveDate> {
+    let cookies = parts.headers.get("cookie")?.to_str().ok()?;
+    for pair in cookies.split(';') {
+        let pair = pair.trim();
+        if let Some(val) = pair.strip_prefix("local_date=") {
+            return parse_date(val);
+        }
+    }
+    None
+}
+
+fn server_today() -> NaiveDate {
+    use chrono::{FixedOffset, Utc};
+    let offset = FixedOffset::west_opt(6 * 3600).unwrap(); // CST (UTC-6)
+    Utc::now().with_timezone(&offset).date_naive()
 }

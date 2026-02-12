@@ -9,7 +9,7 @@ use axum::{
 use serde::Deserialize;
 
 use crate::AppState;
-use crate::auth::AuthUser;
+use crate::auth::{AuthUser, LocalDate};
 use crate::models::task::{Task, TaskWithStreak};
 use crate::models::completion;
 use crate::templates::tasks::{TaskCardPartial, TaskFormPartial, TaskEditPartial};
@@ -37,12 +37,13 @@ struct CreateTaskForm {
 async fn create_task(
     State(state): State<AppState>,
     user: AuthUser,
+    LocalDate(today): LocalDate,
     Form(form): Form<CreateTaskForm>,
 ) -> Response {
     let desc = form.description.as_deref().filter(|s| !s.is_empty());
     match Task::create(&state.db, user.id, &form.name, desc).await {
         Ok(task_id) => {
-            match TaskWithStreak::find_by_id(&state.db, task_id).await {
+            match TaskWithStreak::find_by_id(&state.db, task_id, today).await {
                 Ok(Some(task)) => TaskCardPartial { task }.into_response(),
                 _ => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
             }
@@ -54,21 +55,22 @@ async fn create_task(
 async fn toggle_task(
     State(state): State<AppState>,
     user: AuthUser,
+    LocalDate(today): LocalDate,
     Path(id): Path<i64>,
 ) -> Response {
-    let current = match TaskWithStreak::find_by_id(&state.db, id).await {
+    let current = match TaskWithStreak::find_by_id(&state.db, id, today).await {
         Ok(Some(task)) if task.user_id == user.id => task,
         Ok(Some(_)) => return StatusCode::FORBIDDEN.into_response(),
         _ => return StatusCode::NOT_FOUND.into_response(),
     };
 
     if current.completed_today {
-        let _ = completion::uncomplete_today(&state.db, id).await;
+        let _ = completion::uncomplete_today(&state.db, id, today).await;
     } else {
-        let _ = completion::complete_today(&state.db, id).await;
+        let _ = completion::complete_today(&state.db, id, today).await;
     }
 
-    match TaskWithStreak::find_by_id(&state.db, id).await {
+    match TaskWithStreak::find_by_id(&state.db, id, today).await {
         Ok(Some(task)) => TaskCardPartial { task }.into_response(),
         _ => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
@@ -77,9 +79,10 @@ async fn toggle_task(
 async fn edit_form(
     State(state): State<AppState>,
     user: AuthUser,
+    LocalDate(today): LocalDate,
     Path(id): Path<i64>,
 ) -> Response {
-    match TaskWithStreak::find_by_id(&state.db, id).await {
+    match TaskWithStreak::find_by_id(&state.db, id, today).await {
         Ok(Some(task)) if task.user_id == user.id => {
             TaskEditPartial { task }.into_response()
         }
@@ -90,9 +93,10 @@ async fn edit_form(
 async fn task_card(
     State(state): State<AppState>,
     user: AuthUser,
+    LocalDate(today): LocalDate,
     Path(id): Path<i64>,
 ) -> Response {
-    match TaskWithStreak::find_by_id(&state.db, id).await {
+    match TaskWithStreak::find_by_id(&state.db, id, today).await {
         Ok(Some(task)) if task.user_id == user.id => {
             TaskCardPartial { task }.into_response()
         }
@@ -109,13 +113,14 @@ struct UpdateTaskForm {
 async fn update_task(
     State(state): State<AppState>,
     user: AuthUser,
+    LocalDate(today): LocalDate,
     Path(id): Path<i64>,
     Form(form): Form<UpdateTaskForm>,
 ) -> Response {
     let desc = form.description.as_deref().filter(|s| !s.is_empty());
     let _ = Task::update(&state.db, id, user.id, &form.name, desc).await;
 
-    match TaskWithStreak::find_by_id(&state.db, id).await {
+    match TaskWithStreak::find_by_id(&state.db, id, today).await {
         Ok(Some(task)) if task.user_id == user.id => {
             TaskCardPartial { task }.into_response()
         }

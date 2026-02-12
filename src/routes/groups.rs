@@ -9,7 +9,7 @@ use axum::{
 use serde::Deserialize;
 
 use crate::AppState;
-use crate::auth::AuthUser;
+use crate::auth::{AuthUser, LocalDate};
 use crate::models::group::{Group, MemberWithStreaks};
 use crate::templates::groups::{GroupFeedTemplate, CreateGroupFormPartial, JoinGroupFormPartial};
 
@@ -64,13 +64,14 @@ async fn join_group(
 async fn group_feed(
     State(state): State<AppState>,
     _user: AuthUser,
+    LocalDate(today): LocalDate,
     Path(id): Path<i64>,
 ) -> Response {
     let group = match Group::find_by_id(&state.db, id).await {
         Ok(Some(g)) => g,
         _ => return StatusCode::NOT_FOUND.into_response(),
     };
-    let streaks = Group::member_streaks(&state.db, id).await.unwrap_or_default();
+    let streaks = Group::member_streaks(&state.db, id, today).await.unwrap_or_default();
     let members_grouped = group_streaks_by_member(streaks);
 
     GroupFeedTemplate {

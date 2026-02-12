@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{NaiveDate, NaiveDateTime};
 use rand::Rng;
 use sqlx::PgPool;
 
@@ -99,7 +99,7 @@ impl Group {
         .await
     }
 
-    pub async fn member_streaks(pool: &PgPool, group_id: i64) -> sqlx::Result<Vec<MemberWithStreaks>> {
+    pub async fn member_streaks(pool: &PgPool, group_id: i64, today: NaiveDate) -> sqlx::Result<Vec<MemberWithStreaks>> {
         sqlx::query_as(
             r#"
             WITH RECURSIVE streak_cte(task_id, streak_date, streak_count) AS (
@@ -108,18 +108,18 @@ impl Group {
                 FROM completions c
                 JOIN tasks t ON t.id = c.task_id
                 JOIN group_members gm ON gm.user_id = t.user_id AND gm.group_id = $1
-                WHERE c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
+                WHERE c.completed_date = $2
                 UNION ALL
                 -- Base case: completed yesterday but not today
                 SELECT c.task_id, c.completed_date, 1
                 FROM completions c
                 JOIN tasks t ON t.id = c.task_id
                 JOIN group_members gm ON gm.user_id = t.user_id AND gm.group_id = $1
-                WHERE c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE - INTERVAL '1 day'
+                WHERE c.completed_date = $2 - INTERVAL '1 day'
                   AND NOT EXISTS (
                       SELECT 1 FROM completions c2
                       WHERE c2.task_id = c.task_id
-                        AND c2.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
+                        AND c2.completed_date = $2
                   )
                 UNION ALL
                 -- Recursive: walk backwards day by day
@@ -136,7 +136,7 @@ impl Group {
                 COALESCE(MAX(s.streak_count), 0)::BIGINT AS current_streak,
                 EXISTS (
                     SELECT 1 FROM completions c
-                    WHERE c.task_id = t.id AND c.completed_date = (NOW() AT TIME ZONE 'America/Mexico_City')::DATE
+                    WHERE c.task_id = t.id AND c.completed_date = $2
                 ) AS completed_today
             FROM group_members gm
             JOIN users u ON u.id = gm.user_id
@@ -148,6 +148,7 @@ impl Group {
             "#,
         )
         .bind(group_id)
+        .bind(today)
         .fetch_all(pool)
         .await
     }

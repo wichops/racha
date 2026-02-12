@@ -10,6 +10,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/output.css">
     <script src="/static/js/htmx.min.js"></script>
+    <script>
+    (function() {
+        function localDate() {
+            var d = new Date();
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+        document.cookie = 'local_date=' + localDate() + ';path=/;SameSite=Lax';
+        document.addEventListener('htmx:configRequest', function(e) {
+            e.detail.headers['X-Local-Date'] = localDate();
+        });
+    })();
+    </script>
 </head>
 <body class="min-h-screen">
     {% block nav %}
