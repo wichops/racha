@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
             {% if task.completed_today %}
-            <div class="task-toggle shrink-0" data-task-id="{{ task.id }}">
+            <div class="task-toggle shrink-0" data-task-id="{{ task.id }}" data-completed>
                 <svg class="toggle-ring" viewBox="0 0 48 48">
                     <defs>
                         <linearGradient id="tg-{{ task.id }}" x1="0%" y1="0%" x2="100%" y2="100%">

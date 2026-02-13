@@ -42,10 +42,24 @@
             }
         }
 
+        function fireToggle(taskId) {
+            htmx.ajax('POST', '/tasks/' + taskId + '/toggle', {
+                target: '#task-' + taskId,
+                swap: 'outerHTML'
+            });
+        }
+
         document.addEventListener('pointerdown', function(e) {
             var el = e.target.closest('.task-toggle');
             if (!el) return;
             e.preventDefault();
+
+            /* Completed tasks toggle immediately on click (no hold needed) */
+            if (el.hasAttribute('data-completed')) {
+                fireToggle(el.dataset.taskId);
+                return;
+            }
+
             cancel();
             activeEl = el;
             el.classList.add('holding');
@@ -58,10 +72,7 @@
                 setTimeout(function() {
                     activeEl = null;
                     timer = null;
-                    htmx.ajax('POST', '/tasks/' + taskId + '/toggle', {
-                        target: '#task-' + taskId,
-                        swap: 'outerHTML'
-                    });
+                    fireToggle(taskId);
                 }, 150);
             }, HOLD_MS);
         });
