@@ -42,4 +42,5 @@ impl User {
         .await?;
         Ok(id)
     }
+
 }
