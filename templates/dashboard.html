@@ -4,7 +4,7 @@
 
 {% block nav_right %}
 <div class="flex items-center gap-4">
-    <span class="text-sm" style="color: var(--text-secondary);">{{ username }}</span>
+    <a href="/profile" class="text-sm neu-link">{{ username }}</a>
     <form method="post" action="/logout">
         <button type="submit" class="text-sm neu-link">Log out</button>
     </form>
