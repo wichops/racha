@@ -244,6 +244,47 @@
         text-decoration: line-through;
     }
 
+    /* ===== Hold-to-toggle ring ===== */
+    .task-toggle {
+        position: relative;
+        width: 2.25rem;
+        height: 2.25rem;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: none;
+        cursor: pointer;
+    }
+
+    .toggle-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 3rem;
+        height: 3rem;
+        transform: translate(-50%, -50%) rotate(-90deg);
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .toggle-ring-circle {
+        fill: none;
+        stroke-width: 3;
+        stroke-dasharray: 131.95;
+        stroke-dashoffset: 131.95;
+        stroke-linecap: round;
+    }
+
+    .task-toggle.holding .toggle-ring-circle {
+        stroke-dashoffset: 0;
+        transition: stroke-dashoffset 1s linear;
+    }
+
+    .task-toggle.hold-complete {
+        transform: scale(1.2);
+        transition: transform 0.15s ease;
+    }
+
     /* ===== Milestone badges ===== */
     .milestone-badge {
         display: inline-flex;

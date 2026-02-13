@@ -23,6 +23,56 @@
             e.detail.headers['X-Local-Date'] = localDate();
         });
     })();
+
+    /* Hold-to-toggle: press and hold checkbox for 2s to toggle */
+    (function() {
+        var HOLD_MS = 1000;
+        var activeEl = null;
+        var timer = null;
+
+        function cancel() {
+            if (activeEl) {
+                activeEl.classList.remove('holding');
+                activeEl.classList.remove('hold-complete');
+                activeEl = null;
+            }
+            if (timer) {
+                clearTimeout(timer);
+                timer = null;
+            }
+        }
+
+        document.addEventListener('pointerdown', function(e) {
+            var el = e.target.closest('.task-toggle');
+            if (!el) return;
+            e.preventDefault();
+            cancel();
+            activeEl = el;
+            el.classList.add('holding');
+
+            timer = setTimeout(function() {
+                el.classList.remove('holding');
+                el.classList.add('hold-complete');
+                var taskId = el.dataset.taskId;
+
+                setTimeout(function() {
+                    activeEl = null;
+                    timer = null;
+                    htmx.ajax('POST', '/tasks/' + taskId + '/toggle', {
+                        target: '#task-' + taskId,
+                        swap: 'outerHTML'
+                    });
+                }, 150);
+            }, HOLD_MS);
+        });
+
+        document.addEventListener('pointerup', cancel);
+        document.addEventListener('pointercancel', cancel);
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.task-toggle')) e.preventDefault();
+        });
+    })();
     </script>
 </head>
 <body class="min-h-screen">

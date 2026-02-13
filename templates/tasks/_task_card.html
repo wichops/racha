@@ -2,14 +2,34 @@
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
             {% if task.completed_today %}
-            <button hx-post="/tasks/{{ task.id }}/toggle" hx-target="#task-{{ task.id }}" hx-swap="outerHTML"
-                    class="neu-checkbox-checked shrink-0">
-                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </button>
+            <div class="task-toggle shrink-0" data-task-id="{{ task.id }}">
+                <svg class="toggle-ring" viewBox="0 0 48 48">
+                    <defs>
+                        <linearGradient id="tg-{{ task.id }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ec4899"/>
+                            <stop offset="100%" stop-color="#a855f7"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="toggle-ring-circle" cx="24" cy="24" r="21" stroke="url(#tg-{{ task.id }})" />
+                </svg>
+                <button type="button" class="neu-checkbox-checked">
+                    <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+            </div>
             {% else %}
-            <button hx-post="/tasks/{{ task.id }}/toggle" hx-target="#task-{{ task.id }}" hx-swap="outerHTML"
-                    class="neu-checkbox shrink-0">
-            </button>
+            <div class="task-toggle shrink-0" data-task-id="{{ task.id }}">
+                <svg class="toggle-ring" viewBox="0 0 48 48">
+                    <defs>
+                        <linearGradient id="tg-{{ task.id }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ec4899"/>
+                            <stop offset="100%" stop-color="#a855f7"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="toggle-ring-circle" cx="24" cy="24" r="21" stroke="url(#tg-{{ task.id }})" />
+                </svg>
+                <button type="button" class="neu-checkbox">
+                </button>
+            </div>
             {% endif %}
             <div>
                 <div class="font-medium {% if task.completed_today %}task-completed-text{% endif %}">{{ task.name }}</div>
