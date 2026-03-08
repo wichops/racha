@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post},
     Form,
-    http::StatusCode,
+    http::{StatusCode, HeaderMap, HeaderValue},
 };
 use chrono::NaiveDate;
 use serde::Deserialize;
@@ -88,7 +88,9 @@ async fn toggle_task(
         _ => return StatusCode::NOT_FOUND.into_response(),
     };
 
-    if current.completed_today {
+    let was_completed = current.completed_today;
+
+    if was_completed {
         let _ = completion::uncomplete_today(&state.db, id, today).await;
     } else {
         let _ = completion::complete_today(&state.db, id, today).await;
@@ -96,9 +98,24 @@ async fn toggle_task(
 
     match TaskWithStreak::find_by_id(&state.db, id, today).await {
         Ok(Some(task)) => {
+            let message = if was_completed {
+                format!("Task '{}' uncompleted", task.name)
+            } else {
+                format!("Task '{}' completed", task.name)
+            };
+
             let card = TaskCardPartial { task }.render().unwrap_or_default();
             let progress = fetch_progress_oob(&state.db, user.id, today).await;
-            axum::response::Html(format!("{card}{progress}")).into_response()
+            let body = format!("{card}{progress}");
+            let trigger_json = format!(
+                "{{\"toast\":{{\"message\":\"{}\",\"type\":\"{}\"}}}}",
+                message.replace('"', "\\\""),
+                if was_completed { "info" } else { "success" }
+            );
+            let mut headers = HeaderMap::new();
+            headers.insert("HX-Trigger", HeaderValue::from_str(&trigger_json).unwrap_or_else(|_| HeaderValue::from_static("{}")));
+
+            (headers, axum::response::Html(body)).into_response()
         }
         _ => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
