@@ -30,13 +30,9 @@ function showToast(message, type) {
   }, 3000);
 }
 
-function handleHtmxAfterSwap(event) {
+function handleHtmxAfterRequest(event) {
   const trigger = event.detail.xhr.getResponseHeader('HX-Trigger');
   if (!trigger) return;
-
-  const alreadyProcessed = event.detail.xhr._toastProcessed;
-  if (alreadyProcessed) return;
-  event.detail.xhr._toastProcessed = true;
 
   try {
     const data = JSON.parse(trigger);
@@ -50,5 +46,5 @@ function handleHtmxAfterSwap(event) {
 
 export function initToast() {
   window.showToast = showToast;
-  document.addEventListener('htmx:afterSwap', handleHtmxAfterSwap);
+  document.addEventListener('htmx:afterRequest', handleHtmxAfterRequest);
 }
