@@ -52,13 +52,13 @@ function updateSwipeHint(card, translateX) {
   const rightHint = hint.querySelector('.swipe-hint-right');
 
   if (translateX > 0) {
-    leftHint.style.opacity = Math.min(translateX / SWIPE_THRESHOLD, 1);
-    leftHint.style.transform = `scale(${0.8 + Math.min(translateX / SWIPE_THRESHOLD, 1) * 0.2})`;
-    rightHint.style.opacity = 0;
-  } else if (translateX < 0) {
-    rightHint.style.opacity = Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1);
-    rightHint.style.transform = `scale(${0.8 + Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1) * 0.2})`;
+    rightHint.style.opacity = Math.min(translateX / SWIPE_THRESHOLD, 1);
+    rightHint.style.transform = `scale(${0.8 + Math.min(translateX / SWIPE_THRESHOLD, 1) * 0.2})`;
     leftHint.style.opacity = 0;
+  } else if (translateX < 0) {
+    leftHint.style.opacity = Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1);
+    leftHint.style.transform = `scale(${0.8 + Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1) * 0.2})`;
+    rightHint.style.opacity = 0;
   }
 }
 
