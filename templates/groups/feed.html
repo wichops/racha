@@ -18,8 +18,8 @@
 <div class="mb-6">
     <h1 class="text-2xl font-bold gradient-text">{{ group.name }}</h1>
     <div class="mt-2 flex items-center gap-3">
-        <span class="text-sm" style="color: var(--text-secondary);">Invite code:</span>
-        <code class="neu-inset px-3 py-1 font-mono text-sm" style="color: var(--gradient-purple);">{{ group.invite_code }}</code>
+        <span class="text-sm text-secondary">Invite code:</span>
+        <code class="neu-inset px-3 py-1 font-mono text-sm gradient-text">{{ group.invite_code }}</code>
     </div>
 </div>
 
@@ -27,8 +27,8 @@
     {% for (username, member_tasks) in members_grouped %}
     <div class="neu-raised p-5">
         <h3 class="font-semibold mb-3 flex items-center gap-2">
-            <svg class="w-5 h-5" style="color: var(--gradient-purple);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span style="color: var(--text-primary);">{{ username }}</span>
+            <svg class="w-5 h-5 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>{{ username }}</span>
         </h3>
         <div class="space-y-2">
             {% for mt in member_tasks %}
@@ -37,7 +37,7 @@
                     {% if mt.completed_today %}
                     <svg class="w-5 h-5" style="color: var(--gradient-green);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     {% else %}
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" style="color: var(--text-secondary); opacity: 0.4;"/></svg>
+                    <svg class="w-5 h-5 text-secondary opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>
                     {% endif %}
                     <span class="{% if mt.completed_today %}task-completed-text{% endif %}">{{ mt.task_name }}</span>
                 </div>
@@ -48,7 +48,7 @@
                         {{ mt.current_streak }}
                     </div>
                     {% else %}
-                    <span class="text-xs" style="color: var(--text-secondary);">0 days</span>
+                    <span class="text-xs text-secondary">0 days</span>
                     {% endif %}
                     {% if mt.current_streak == 7 || mt.current_streak == 30 || mt.current_streak == 100 %}
                     <span class="milestone-badge">
@@ -64,7 +64,7 @@
     {% endfor %}
     {% if members_grouped.is_empty() %}
     <div class="neu-raised p-8 text-center">
-        <p style="color: var(--text-secondary);">No members with active tasks yet.</p>
+        <p class="text-secondary">No members with active tasks yet.</p>
     </div>
     {% endif %}
 </div>

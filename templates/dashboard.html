@@ -13,19 +13,16 @@
 
 {% block content %}
 <div class="grid md:grid-cols-3 gap-6">
-    <!-- Tasks column -->
     <div class="md:col-span-2 space-y-5">
-        <!-- Header -->
         <div>
             <h2 class="text-2xl font-bold gradient-text">Daily Tasks</h2>
-            <p class="text-sm mt-1" style="color: var(--text-secondary);">Stay consistent, build streaks</p>
+            <p class="text-sm mt-1 text-secondary">Stay consistent, build streaks</p>
         </div>
 
         <div id="dashboard-progress" class="space-y-5">
         {% include "dashboard/_progress.html" %}
         </div>
 
-        <!-- New task button -->
         <div class="flex items-center justify-between">
             <span></span>
             <button hx-get="/tasks/form" hx-target="#task-form-slot" hx-swap="innerHTML"
@@ -42,13 +39,12 @@
             {% endfor %}
             {% if tasks.is_empty() %}
             <div class="neu-raised p-8 text-center">
-                <p style="color: var(--text-secondary);">No tasks yet. Create one to start tracking!</p>
+                <p class="text-secondary">No tasks yet. Create one to start tracking!</p>
             </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- Groups sidebar -->
     <div>
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold gradient-text">Groups</h2>
@@ -67,8 +63,8 @@
             {% for group in groups %}
             <a href="/groups/{{ group.id }}"
                class="block neu-flat p-4 hover:scale-[1.02] transition-transform">
-                <div class="font-medium" style="color: var(--text-primary);">{{ group.name }}</div>
-                <div class="text-sm flex items-center gap-1.5 mt-1" style="color: var(--text-secondary);">
+                <div class="font-medium">{{ group.name }}</div>
+                <div class="text-sm flex items-center gap-1.5 mt-1 text-secondary">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     {{ group.member_count }} member{{ group.member_count|pluralize }}
                 </div>
@@ -76,7 +72,7 @@
             {% endfor %}
             {% if groups.is_empty() %}
             <div class="neu-flat p-4 text-center">
-                <p class="text-sm" style="color: var(--text-secondary);">No groups yet.</p>
+                <p class="text-sm text-secondary">No groups yet.</p>
             </div>
             {% endif %}
         </div>

@@ -16,8 +16,8 @@
         <button type="button" hx-get="/tasks/{{ task.id }}/card" hx-target="#task-{{ task.id }}" hx-swap="outerHTML"
                 class="text-sm neu-link">Cancel</button>
         <button type="button" hx-post="/tasks/{{ task.id }}/archive" hx-target="#task-{{ task.id }}" hx-swap="delete"
-                class="ml-auto neu-flat w-8 h-8 flex items-center justify-center" style="border-radius: 50%;">
-            <svg class="w-4 h-4" style="color: #ef4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                class="ml-auto neu-flat w-8 h-8 flex items-center justify-center rounded-full">
+            <svg class="w-4 h-4 text-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
     </div>
 </form>
