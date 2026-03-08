@@ -30,15 +30,15 @@ function createSwipeHint() {
   hint.innerHTML = `
     <div class="swipe-hint-left">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="20 6 9 17 4 12"/>
-      </svg>
-      <span>Complete</span>
-    </div>
-    <div class="swipe-hint-right">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 12h18"/>
       </svg>
       <span>Uncomplete</span>
+    </div>
+    <div class="swipe-hint-right">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span>Complete</span>
     </div>
   `;
   return hint;
@@ -52,13 +52,13 @@ function updateSwipeHint(card, translateX) {
   const rightHint = hint.querySelector('.swipe-hint-right');
 
   if (translateX > 0) {
-    rightHint.style.opacity = Math.min(translateX / SWIPE_THRESHOLD, 1);
-    rightHint.style.transform = `scale(${0.8 + Math.min(translateX / SWIPE_THRESHOLD, 1) * 0.2})`;
-    leftHint.style.opacity = 0;
-  } else if (translateX < 0) {
-    leftHint.style.opacity = Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1);
-    leftHint.style.transform = `scale(${0.8 + Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1) * 0.2})`;
+    leftHint.style.opacity = Math.min(translateX / SWIPE_THRESHOLD, 1);
+    leftHint.style.transform = `scale(${0.8 + Math.min(translateX / SWIPE_THRESHOLD, 1) * 0.2})`;
     rightHint.style.opacity = 0;
+  } else if (translateX < 0) {
+    rightHint.style.opacity = Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1);
+    rightHint.style.transform = `scale(${0.8 + Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1) * 0.2})`;
+    leftHint.style.opacity = 0;
   }
 }
 
@@ -123,18 +123,18 @@ function handleTouchEnd(_event) {
 
   if (crossedThreshold && isHorizontalSwipe) {
     if (deltaX < 0) {
-      if (!completed) {
+      if (completed) {
         activeCard.style.transition = 'transform 0.2s ease';
-        activeCard.style.transform = 'translateX(-100%)';
+        activeCard.style.transform = 'translateX(-40px)';
         setTimeout(() => fireToggle(taskId), 100);
       } else {
         activeCard.style.transition = 'transform 0.3s ease';
         activeCard.style.transform = 'translateX(0)';
       }
     } else {
-      if (completed) {
+      if (!completed) {
         activeCard.style.transition = 'transform 0.2s ease';
-        activeCard.style.transform = 'translateX(100%)';
+        activeCard.style.transform = 'translateX(40px)';
         setTimeout(() => fireToggle(taskId), 100);
       } else {
         activeCard.style.transition = 'transform 0.3s ease';

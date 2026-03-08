@@ -32,15 +32,19 @@ function showToast(message, type) {
 
 function handleHtmxAfterSwap(event) {
   const trigger = event.detail.xhr.getResponseHeader('HX-Trigger');
-  if (trigger) {
-    try {
-      const data = JSON.parse(trigger);
-      if (data.toast) {
-        showToast(data.toast.message, data.toast.type);
-      }
-    } catch {
-      // HX-Trigger might be a plain string, ignore
+  if (!trigger) return;
+
+  const alreadyProcessed = event.detail.xhr._toastProcessed;
+  if (alreadyProcessed) return;
+  event.detail.xhr._toastProcessed = true;
+
+  try {
+    const data = JSON.parse(trigger);
+    if (data.toast) {
+      showToast(data.toast.message, data.toast.type);
     }
+  } catch {
+    // HX-Trigger might be a plain string, ignore
   }
 }
 
