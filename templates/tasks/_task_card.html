@@ -1,4 +1,4 @@
-<div id="task-{{ task.id }}" class="neu-raised p-4 animate-slide-in">
+<div id="task-{{ task.id }}" class="task-card neu-raised p-4 animate-slide-in" data-task-id="{{ task.id }}" data-completed="{{ task.completed_today }}" style="touch-action: pan-y;">
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
             {% if task.completed_today %}
