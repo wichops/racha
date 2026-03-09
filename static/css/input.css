@@ -299,52 +299,54 @@
     color: #ef4444;
   }
 
-  .task-card {
+  .task-card-wrapper {
     position: relative;
     overflow: hidden;
+    border-radius: 1rem;
+  }
+
+  .task-card {
+    position: relative;
+    z-index: 10;
     touch-action: pan-y;
     user-select: none;
     -webkit-user-select: none;
+    background: var(--bg-card);
   }
 
-  .swipe-hint {
+  .swipe-action {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0 1.5rem;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .swipe-hint-left,
-  .swipe-hint-right {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
     font-weight: 600;
     font-size: 0.875rem;
-    opacity: 0;
-    transition: opacity 0.15s ease;
+    z-index: 1;
   }
 
-  .swipe-hint-left {
-    color: #8888a0;
+  .swipe-action-left {
+    justify-content: flex-start;
+    background: linear-gradient(135deg, #374151, #4b5563);
+    color: #e5e7eb;
   }
 
-  .swipe-hint-left svg {
+  .swipe-action-left svg {
     width: 1.5rem;
     height: 1.5rem;
+    margin-right: 0.5rem;
   }
 
-  .swipe-hint-right {
-    color: #22c55e;
+  .swipe-action-right {
+    justify-content: flex-end;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: white;
   }
 
-  .swipe-hint-right svg {
+  .swipe-action-right svg {
     width: 1.5rem;
     height: 1.5rem;
+    margin-left: 0.5rem;
   }
 }
 
